@@ -6,9 +6,7 @@ import {
   Filter, 
   Search, 
   MoreHorizontal, 
-  Edit, 
   Trash2,
-  Key,
   FileText
 } from 'lucide-react';
 import Link from 'next/link';
@@ -48,13 +46,13 @@ export default function UsersManagement() {
   const fetchUsers = async (page = 1) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/user`);
+      const response = await fetch(`/api/user?page=${page}&search=${searchTerm}&role=${roleFilter}`);
       const data = await response.json();
-      setUsers(data || []); // Ensure users is always an array
+      setUsers(data.users || []); // Ensure users is always an array
       setPagination(data.pagination || {
         currentPage: 1,
         totalPages: 1,
-        totalUsers: 0
+        totalUsers: 0,
       }); // Ensure pagination has default values
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -62,6 +60,7 @@ export default function UsersManagement() {
       setIsLoading(false);
     }
   };
+  
 
   useEffect(() => {
     fetchUsers();

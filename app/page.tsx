@@ -1,14 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import {
-  ShieldCheck,
-  Bolt,
-  Globe,
-  Heart,
-  Users,
-  Activity,
-  HelpCircle,
-} from "lucide-react";
+import { ShieldCheck, Bolt, Globe, Heart, Users, Activity } from "lucide-react";
 
 export default function Home() {
   const features = [
@@ -140,8 +132,8 @@ export default function Home() {
         <section className="mt-24 text-center">
           <h2 className="text-4xl font-bold mb-6">Our Collective Impact</h2>
           <p className="max-w-2xl mx-auto text-green-200 mb-12">
-            Together, we're building a more resilient and responsive emergency
-            support ecosystem.
+            Together, we&#39;re building a more resilient and responsive
+            emergency support ecosystem.
           </p>
 
           <div className="grid md:grid-cols-3 gap-6">

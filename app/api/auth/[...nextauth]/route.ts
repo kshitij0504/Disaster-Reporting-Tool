@@ -42,7 +42,7 @@ const handler = NextAuth({
           id: user.id.toString(),   // Send user id
           email: user.email,
           name: user.name,
-          role: user.role,           // Send user role
+          role: user.role,          // Send user role
         };
       },
     }),
@@ -50,15 +50,15 @@ const handler = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;   // Attach id to token
-        token.role = user.role; // Attach role to token
+        token.id = user.id;       // Attach id to token
+        token.role = user.role;   // Attach role to token
       }
       return token;
     },
     async session({ session, token }) {
       if (session?.user) {
-        session.user.id = token.id;   // Attach id to session.user
-        session.user.role = token.role; // Attach role to session.user
+        session.user.id = token.id;       // Attach id to session.user
+        session.user.role = token.role;   // Attach role to session.user
       }
       return session;
     },

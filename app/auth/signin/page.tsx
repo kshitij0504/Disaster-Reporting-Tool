@@ -37,6 +37,7 @@ export default function SignIn() {
         }
       }
     } catch (error) {
+    console.error(error);
       setError("An error occurred during sign in");
     } finally {
       setIsLoading(false);
