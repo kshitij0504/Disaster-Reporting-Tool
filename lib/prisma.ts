@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 // Extend the global type to include prisma as a global property.
 declare global {
-  var prisma: PrismaClient | undefined;
+  let prisma: PrismaClient | undefined;
 }
 
 // Create or reuse the Prisma client
