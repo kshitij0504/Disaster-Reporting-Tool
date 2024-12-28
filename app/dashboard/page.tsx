@@ -1,7 +1,7 @@
 'use client'
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { Report, ReportStatus, ReportType, User, Role } from "@prisma/client";
+import { ReportStatus, ReportType, Role } from "@prisma/client";
 import { signOut } from "next-auth/react";
 import { 
   Award, 
