@@ -1,8 +1,23 @@
 "use-client";
+type ReportType = "NON_EMERGENCY" | "LOW_PRIORITY" | "EMERGENCY" | "CRITICAL";
+
+interface ReportData {
+  reportId: string;
+  type: ReportType;
+  specificType: string;
+  title: string;
+  description: string;
+  location: string;
+  latitude: number | null;
+  longitude: number | null;
+  image: string | null;
+  status: "PENDING";
+  userId: string | undefined;
+}
 
 interface ReportSubmittedProps {
-  data: any;
-  onComplete: (data: any) => void;
+  data: ReportData;  // Use the ReportData type instead of any
+  onComplete: (data: ReportData) => void;  // Update the onComplete handler to accept the correct type
 }
 
 export function ReportSubmitted({ data }: ReportSubmittedProps) {

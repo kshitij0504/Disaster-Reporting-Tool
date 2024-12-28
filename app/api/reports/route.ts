@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-
 import { ReportStatus, ReportType } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
+import { Prisma } from "@prisma/client";  // Import Prisma error types
+
 export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -49,28 +50,29 @@ export async function GET(req: Request) {
         },
       },
     });
-    
-    
+
     console.log("Fetched reports:", reports); // Log the reports
     console.log("Reports count:", reports.length); // Log the number of reports
 
     return NextResponse.json(reports);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to fetch reports:", error);
 
-    // More specific error messages
-    if (error.code === "P1001") {
-      return NextResponse.json(
-        { error: "Cannot connect to database. Please try again later." },
-        { status: 503 }
-      );
-    }
+    // Handle the error safely
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P1001") {
+        return NextResponse.json(
+          { error: "Cannot connect to database. Please try again later." },
+          { status: 503 }
+        );
+      }
 
-    if (error.code === "P2024") {
-      return NextResponse.json(
-        { error: "Database connection timeout. Please try again." },
-        { status: 504 }
-      );
+      if (error.code === "P2024") {
+        return NextResponse.json(
+          { error: "Database connection timeout. Please try again." },
+          { status: 504 }
+        );
+      }
     }
 
     return NextResponse.json(

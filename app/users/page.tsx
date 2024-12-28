@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   User, 
   Mail, 
@@ -10,7 +10,7 @@ import {
   FileText
 } from 'lucide-react';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 
 // Types to match Prisma schema
 type UserRole = 'USER' | 'ADMIN' | 'MODERATOR';
@@ -43,28 +43,28 @@ export default function UsersManagement() {
   const [roleFilter, setRoleFilter] = useState<UserRole | 'ALL'>('ALL');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const {data: session} = useSession()
-  const fetchUsers = async (page = 1) => {
+  // Use useCallback to memoize the fetchUsers function
+  const fetchUsers = useCallback(async (page = 1) => {
     setIsLoading(true);
     try {
       const response = await fetch(`/api/user?page=${page}&search=${searchTerm}&role=${roleFilter}`);
       const data = await response.json();
-      setUsers(data.users || []); // Ensure users is always an array
+      setUsers(data.users || []); 
       setPagination(data.pagination || {
         currentPage: 1,
         totalPages: 1,
         totalUsers: 0,
-      }); // Ensure pagination has default values
+      });
     } catch (error) {
       console.error('Error fetching users:', error);
     } finally {
       setIsLoading(false);
     }
-  };
-  
+  }, [searchTerm, roleFilter]); // Add dependencies to useCallback
 
   useEffect(() => {
     fetchUsers();
-  }, [searchTerm, roleFilter]);
+  }, [fetchUsers]); 
 
   const handleRoleChange = async (user: User, newRole: UserRole) => {
     try {

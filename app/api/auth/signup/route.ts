@@ -1,4 +1,3 @@
-//@ts-nocheck
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
@@ -52,7 +51,13 @@ export async function POST(request: Request) {
       },
     });
 
-    const { password, ...userWithoutPassword } = user;
+    // Create a response object excluding the password
+    const userWithoutPassword = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    };
 
     return NextResponse.json(userWithoutPassword, { status: 201 });
   } catch (error) {

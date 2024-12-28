@@ -12,6 +12,14 @@ declare module "next-auth" {
   }
 
   interface User extends NextAuthUser {
-    role: string; // Add role here
+    id: string;
+    email: string;
+    name?: string;
+    role: string; 
+  }
+
+  interface JWT {
+    id: string;
+    role: string;
   }
 }

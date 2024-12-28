@@ -18,8 +18,23 @@ const REPORT_TYPES = [
 
 type ReportType = "NON_EMERGENCY" | "LOW_PRIORITY" | "EMERGENCY" | "CRITICAL";
 
+interface ReportData {
+  reportId: string;
+  type: ReportType;
+  specificType: string;
+  title: string;
+  description: string;
+  location: string;
+  latitude: number | null;
+  longitude: number | null;
+  image: string | null;
+  status: "PENDING";
+  userId: string | undefined;
+}
+
+
 interface ReportFormProps {
-  onComplete: (data: any) => void;
+  onComplete: (data: ReportData) => void;
 }
 
 export function ReportForm({ onComplete }: ReportFormProps) {
@@ -184,7 +199,7 @@ export function ReportForm({ onComplete }: ReportFormProps) {
     setIsSubmitting(true);
 
     try {
-      const reportData = {
+      const reportData : ReportData = {
         reportId: generateReportId(),
         type: formData.incidentType,
         specificType: formData.specificType,

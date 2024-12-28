@@ -1,12 +1,15 @@
-//@ts-nocheck
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import NextAuth from "next-auth";
+import prisma from "@/lib/prisma";
+import NextAuth, { AuthOptions, User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import prisma from "@/lib/prisma";
+import { Adapter } from "next-auth/adapters";
 
-const handler = NextAuth({
-  adapter: PrismaAdapter(prisma),
+
+const customPrismaAdapter = PrismaAdapter(prisma);
+
+const authOptions: AuthOptions = {
+  adapter: customPrismaAdapter as unknown as Adapter,
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -22,6 +25,13 @@ const handler = NextAuth({
         const user = await prisma.user.findUnique({
           where: {
             email: credentials.email,
+          },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            password: true,
+            role: true, // Explicitly select role
           },
         });
 
@@ -39,26 +49,26 @@ const handler = NextAuth({
         }
 
         return {
-          id: user.id.toString(),   // Send user id
+          id: user.id.toString(),
           email: user.email,
           name: user.name,
-          role: user.role,          // Send user role
-        };
+          role: user.role as string, // Ensure role is treated as string
+        } as User;
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;       // Attach id to token
-        token.role = user.role;   // Attach role to token
+        token.id = user.id;
+        token.role = user.role as string; // Ensure role is string
       }
       return token;
-    },
+    },    
     async session({ session, token }) {
       if (session?.user) {
-        session.user.id = token.id;       // Attach id to session.user
-        session.user.role = token.role;   // Attach role to session.user
+        session.user.id = token.id as string; // Ensure id is string
+        session.user.role = token.role as string; // Ensure role is string
       }
       return session;
     },
@@ -69,6 +79,8 @@ const handler = NextAuth({
   session: {
     strategy: "jwt",
   },
-});
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

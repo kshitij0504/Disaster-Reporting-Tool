@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import { AddressAutofill } from "@mapbox/search-js-react";
@@ -10,6 +9,7 @@ interface LocationInputProps {
   onChange: (value: string) => void;
   onCoordinatesChange?: (lat: number | null, lng: number | null) => void;
 }
+
 
 export function LocationInput({
   value,
