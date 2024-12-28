@@ -5,11 +5,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { Adapter } from "next-auth/adapters";
 
-
-const customPrismaAdapter = PrismaAdapter(prisma);
-
 const authOptions: AuthOptions = {
-  adapter: customPrismaAdapter as unknown as Adapter,
+  adapter: PrismaAdapter(prisma) as Adapter, // Remove unnecessary casting
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -31,7 +28,7 @@ const authOptions: AuthOptions = {
             email: true,
             name: true,
             password: true,
-            role: true, // Explicitly select role
+            role: true,
           },
         });
 
@@ -52,7 +49,7 @@ const authOptions: AuthOptions = {
           id: user.id.toString(),
           email: user.email,
           name: user.name,
-          role: user.role as string, // Ensure role is treated as string
+          role: user.role as string,
         } as User;
       },
     }),
@@ -61,14 +58,14 @@ const authOptions: AuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = user.role as string; // Ensure role is string
+        token.role = user.role as string;
       }
       return token;
-    },    
+    },
     async session({ session, token }) {
       if (session?.user) {
-        session.user.id = token.id as string; // Ensure id is string
-        session.user.role = token.role as string; // Ensure role is string
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
       }
       return session;
     },
