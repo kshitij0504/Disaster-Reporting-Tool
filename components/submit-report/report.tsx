@@ -19,12 +19,13 @@ interface ReportData {
   status: "PENDING";
   userId: string | undefined;
 }
-export function ReportLayout() {
+
+const ReportLayout = () => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [reportData, setReportData] = useState<ReportData | undefined>(undefined);
+  const [reportData, setReportData] = useState<ReportData | null>(null); // Initialize with null
 
   const handleStepComplete = async (data: ReportData) => {
-    setReportData({ ...reportData, ...data });
+    setReportData((prevData) => ({ ...prevData, ...data })); // Spread previous data
 
     if (currentStep === 4) {
       return;
@@ -36,9 +37,11 @@ export function ReportLayout() {
   return (
     <div className="rounded-2xl bg-zinc-900 p-8">
       {currentStep === 1 && <ReportForm onComplete={handleStepComplete} />}
-      {currentStep === 2 && reportData && (
+      {currentStep === 2 && reportData && ( // Check if reportData is not null
         <ReportSubmitted data={reportData} onComplete={handleStepComplete} />
       )}
     </div>
   );
 }
+
+export default ReportLayout

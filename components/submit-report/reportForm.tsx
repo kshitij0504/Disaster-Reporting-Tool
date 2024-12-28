@@ -32,7 +32,6 @@ interface ReportData {
   userId: string | undefined;
 }
 
-
 interface ReportFormProps {
   onComplete: (data: ReportData) => void;
 }
@@ -55,105 +54,39 @@ export function ReportForm({ onComplete }: ReportFormProps) {
     longitude: null,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const {data: session} = useSession()
-  console.log(session?.user.id)
+  const { data: session } = useSession();
+  console.log(session?.user.id);
 
-  const addLocationToImage = (base64Image: string, location: string): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-  
-        // Set canvas dimensions to match the image
-        canvas.width = img.width;
-        canvas.height = img.height;
-  
-        // Draw the original image
-        ctx?.drawImage(img, 0, 0);
-  
-        // Set text styling
-        if (ctx) {
-          // Adjust font size based on image width
-          const fontSize = Math.max(20, Math.floor(img.width * 0.06));
-          ctx.font = `bold ${fontSize}px Arial`;
-          
-          // Set text color to red
-          ctx.fillStyle = 'red';
-          ctx.strokeStyle = 'black';
-          ctx.lineWidth = 3;
-  
-          // Position text at the bottom of the image
-          const padding = 15;
-          const textX = padding;
-          const textY = canvas.height - padding;
-  
-          // Create a semi-transparent dark background for better readability
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-          const textMetrics = ctx.measureText(location);
-          ctx.fillRect(0, canvas.height - fontSize - 2 * padding, 
-                       textMetrics.width + 2 * padding, 
-                       fontSize + 2 * padding);
-  
-          // Draw text outline
-          ctx.strokeText(location, textX, textY);
-          
-          // Draw text in red
-          ctx.fillStyle = 'red';
-          ctx.fillText(location, textX, textY);
-        }
-  
-        // Convert canvas back to base64
-        resolve(canvas.toDataURL());
-      };
-  
-      img.onerror = reject;
-      img.src = base64Image;
-    });
-  };
-  
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-  
+
     setIsAnalyzing(true);
-  
+
     try {
       const base64 = await new Promise((resolve) => {
         const reader = new FileReader();
         reader.onloadend = () => resolve(reader.result);
         reader.readAsDataURL(file);
       });
-  
+
       const response = await fetch("/api/analyze-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ image: base64 }),
       });
-  
+
       const data = await response.json();
-      console.log(data)
-      
+      console.log(data);
+
       if (data.title && data.description && data.reportType) {
-        // Modify image with location if available
-        let finalImage = base64 as string;
-        if (formData.location) {
-          try {
-            finalImage = await addLocationToImage(base64 as string, formData.location);
-          } catch (overlayError) {
-            console.error("Error adding location to image", overlayError);
-            // Fall back to original image if overlay fails
-            finalImage = base64 as string;
-          }
-        }
-  
         setFormData((prev) => ({
           ...prev,
           title: data.title,
           description: data.description,
           specificType: data.reportType,
         }));
-        setImage(finalImage);
+        setImage(base64 as string);
       } else if (data.error) {
         toast.error("Please upload an image of a disaster scenario", {
           duration: 4000,
@@ -199,7 +132,7 @@ export function ReportForm({ onComplete }: ReportFormProps) {
     setIsSubmitting(true);
 
     try {
-      const reportData : ReportData = {
+      const reportData: ReportData = {
         reportId: generateReportId(),
         type: formData.incidentType,
         specificType: formData.specificType,
@@ -210,7 +143,7 @@ export function ReportForm({ onComplete }: ReportFormProps) {
         longitude: coordinates.longitude,
         image: image,
         status: "PENDING",
-        userId: session?.user.id
+        userId: session?.user.id,
       };
 
       const response = await fetch("/api/reports/create-report", {
@@ -234,8 +167,6 @@ export function ReportForm({ onComplete }: ReportFormProps) {
       setIsSubmitting(false);
     }
   };
-
-  
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
@@ -303,7 +234,6 @@ export function ReportForm({ onComplete }: ReportFormProps) {
           </div>
         </button>
 
-        {/* New Low Priority Button */}
         <button
           type="button"
           onClick={() =>
@@ -336,7 +266,6 @@ export function ReportForm({ onComplete }: ReportFormProps) {
           </div>
         </button>
 
-        {/* New Critical Button */}
         <button
           type="button"
           onClick={() =>
@@ -496,8 +425,8 @@ export function ReportForm({ onComplete }: ReportFormProps) {
             setFormData((prev) => ({ ...prev, title: e.target.value }))
           }
           className="w-full rounded-xl bg-zinc-900/50 border border-zinc-800 px-4 py-3.5
-                   text-white transition-colors duration-200
-                   focus:outline-none focus:ring-2 focus:ring-sky-500/40"
+                     text-white transition-colors duration-200
+                     focus:outline-none focus:ring-2 focus:ring-sky-500/40"
           required
         />
       </div>
@@ -514,8 +443,8 @@ export function ReportForm({ onComplete }: ReportFormProps) {
           }
           rows={4}
           className="w-full rounded-xl bg-zinc-900/50 border border-zinc-800 px-4 py-3.5
-                   text-white transition-colors duration-200
-                   focus:outline-none focus:ring-2 focus:ring-sky-500/40"
+                     text-white transition-colors duration-200
+                     focus:outline-none focus:ring-2 focus:ring-sky-500/40"
           required
         />
       </div>
@@ -525,9 +454,9 @@ export function ReportForm({ onComplete }: ReportFormProps) {
         type="submit"
         disabled={isSubmitting}
         className="w-full relative group overflow-hidden rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 
-                 px-4 py-3.5 text-sm font-medium text-white shadow-lg
-                 transition-all duration-200 hover:from-sky-400 hover:to-blue-500
-                 disabled:opacity-50 disabled:cursor-not-allowed"
+                   px-4 py-3.5 text-sm font-medium text-white shadow-lg
+                   transition-all duration-200 hover:from-sky-400 hover:to-blue-500
+                   disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <div className="relative flex items-center justify-center gap-2">
           {isSubmitting ? (

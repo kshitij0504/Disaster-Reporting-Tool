@@ -1,19 +1,35 @@
-'use client'
-import { ReportLayout } from "@/components/submit-report/report";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+'use client';
+import dynamic from 'next/dynamic';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+// Dynamically import ReportLayout with ssr: false to render it only on the client side
+const ReportLayout = dynamic(() => import('@/components/submit-report/report'), { 
+  ssr: false 
+});
 
 export default function SubmitReport() {
-  const { data: session} = useSession();
+  const { data: session } = useSession();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
 
+  // This effect is always called and controls the mounted state for hydration
   useEffect(() => {
-    // Redirect to login page if not authenticated
+    setMounted(true);
+  }, []);
+
+  // Another effect for redirection which will run after the component has mounted
+  useEffect(() => {
     if (!session) {
-      router.push("/auth/signin");
+      router.push('/auth/signin');
     }
   }, [session, router]);
+
+  // Don't render anything until after mounting to avoid hydration issues
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <div className="relative min-h-screen bg-black selection:bg-green-500/20 overflow-hidden">
@@ -52,6 +68,7 @@ export default function SubmitReport() {
           </div>
 
           <div className="mt-8 bg-zinc-900/50 rounded-2xl border border-white/5 p-6">
+            {/* Dynamically rendered ReportLayout */}
             <ReportLayout />
           </div>
         </div>
